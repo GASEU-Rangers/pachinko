@@ -4,7 +4,8 @@ const {
     Runner,
     World,
     Bodies,
-    Events
+    Events,
+    Composite
 } = Matter;
 
 const canvas = document.getElementById("game");
@@ -25,7 +26,7 @@ const render = Render.create({
         width,
         height,
         wireframes: false,
-        background: "#1d1d1d"
+        background: "#ffffff"
     }
 });
 
@@ -37,35 +38,42 @@ Runner.run(runner, engine);
 let score = 0;
 const scoreElement = document.getElementById("score");
 
+//
 // 벽
-const walls = [
-    Bodies.rectangle(width / 2, height + 25, width, 50, { isStatic: true }),
-    Bodies.rectangle(-25, height / 2, 50, height, { isStatic: true }),
-    Bodies.rectangle(width + 25, height / 2, 50, height, { isStatic: true })
-];
+//
+World.add(world, [
+    Bodies.rectangle(width / 2, height + 25, width, 50, {
+        isStatic: true
+    }),
 
-World.add(world, walls);
+    Bodies.rectangle(-25, height / 2, 50, height, {
+        isStatic: true
+    }),
 
+    Bodies.rectangle(width + 25, height / 2, 50, height, {
+        isStatic: true
+    })
+]);
+
+//
 // 핀 생성
+//
 const pegs = [];
 
 for (let row = 0; row < 10; row++) {
-    const cols = 10;
+    for (let col = 0; col < 10; col++) {
 
-    for (let col = 0; col < cols; col++) {
-        const x =
-            100 +
-            col * 60 +
-            (row % 2 ? 30 : 0);
-
-        const y = 120 + row * 50;
-
-        const peg = Bodies.circle(x, y, 6, {
-            isStatic: true,
-            render: {
-                fillStyle: "#ffffff"
+        const peg = Bodies.circle(
+            100 + col * 60 + (row % 2 ? 30 : 0),
+            120 + row * 50,
+            6,
+            {
+                isStatic: true,
+                render: {
+                    fillStyle: "#000000"
+                }
             }
-        });
+        );
 
         pegs.push(peg);
     }
@@ -73,74 +81,144 @@ for (let row = 0; row < 10; row++) {
 
 World.add(world, pegs);
 
-// 점수 칸
-const slots = [];
-const slotValues = [100, 50, 20, 10, 20, 50, 100];
+//
+// 점수칸
+//
+const slotValues = [
+    500,
+    200,
+    100,
+    50,
+    100,
+    200,
+    500
+];
+
+const dividerColors = [
+    "#ff0000",
+    "#ff7f00",
+    "#ffff00",
+    "#00aa00",
+    "#0066ff",
+    "#000080",
+    "#8000ff",
+    "#ff69b4"
+];
 
 const slotWidth = width / slotValues.length;
 
+//
+// 칸막이
+//
 for (let i = 0; i < slotValues.length; i++) {
 
+    const x = i * slotWidth;
+
     const divider = Bodies.rectangle(
-        i * slotWidth,
-        height - 80,
-        8,
-        160,
+        x,
+        height - 50,
+        4,
+        80,
         {
             isStatic: true,
             render: {
-                fillStyle: "#00ff99"
+                fillStyle: dividerColors[i]
             }
         }
     );
-
-    slots.push({
-        x: i * slotWidth,
-        value: slotValues[i]
-    });
 
     World.add(world, divider);
 }
 
-// 마지막 칸 벽
+//
+// 마지막 벽
+//
 World.add(
     world,
     Bodies.rectangle(
         width,
-        height - 80,
-        8,
-        160,
+        height - 50,
+        4,
+        80,
         {
-            isStatic: true
+            isStatic: true,
+            render: {
+                fillStyle: dividerColors[7]
+            }
         }
     )
 );
 
-// 구슬 발사
-document.getElementById("dropBall").addEventListener("click", () => {
+//
+// 걸림 방지 경사판
+//
+for (let i = 0; i <= slotValues.length; i++) {
 
-    const ball = Bodies.circle(
-        width / 2 + (Math.random() * 100 - 50),
-        40,
-        10,
+    const x = i * slotWidth;
+
+    const leftRamp = Bodies.rectangle(
+        x - 8,
+        height - 95,
+        20,
+        4,
         {
-            restitution: 0.6,
-            friction: 0.001,
+            isStatic: true,
+            angle: Math.PI / 4,
             render: {
-                fillStyle: "#ffd700"
+                fillStyle: "#666"
             }
         }
     );
 
-    ball.label = "ball";
+    const rightRamp = Bodies.rectangle(
+        x + 8,
+        height - 95,
+        20,
+        4,
+        {
+            isStatic: true,
+            angle: -Math.PI / 4,
+            render: {
+                fillStyle: "#666"
+            }
+        }
+    );
 
-    World.add(world, ball);
-});
+    World.add(world, [leftRamp, rightRamp]);
+}
 
-// 점수 판정
+//
+// 구슬 발사
+//
+document
+    .getElementById("dropBall")
+    .addEventListener("click", () => {
+
+        const ball = Bodies.circle(
+            width / 2 + (Math.random() * 100 - 50),
+            40,
+            10,
+            {
+                restitution: 0.8,
+                friction: 0,
+                frictionAir: 0.001,
+                render: {
+                    fillStyle: "#000"
+                }
+            }
+        );
+
+        ball.label = "ball";
+
+        World.add(world, ball);
+    });
+
+//
+// 점수 계산
+//
 Events.on(engine, "afterUpdate", () => {
 
-    const bodies = Matter.Composite.allBodies(world);
+    const bodies = Composite.allBodies(world);
 
     bodies.forEach(body => {
 
@@ -155,9 +233,39 @@ Events.on(engine, "afterUpdate", () => {
             );
 
             score += slotValues[slotIndex];
+
             scoreElement.textContent = score;
 
             World.remove(world, body);
         }
     });
+});
+
+//
+// 점수 표시
+//
+Events.on(render, "afterRender", () => {
+
+    const ctx = render.context;
+
+    ctx.save();
+
+    ctx.fillStyle = "#000";
+    ctx.font = "16px sans-serif";
+    ctx.textAlign = "center";
+
+    for (let i = 0; i < slotValues.length; i++) {
+
+        const x =
+            i * slotWidth +
+            slotWidth / 2;
+
+        ctx.fillText(
+            slotValues[i],
+            x,
+            height - 15
+        );
+    }
+
+    ctx.restore();
 });

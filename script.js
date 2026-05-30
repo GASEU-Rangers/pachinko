@@ -53,6 +53,7 @@ const pegs = [];
 
 for (let row = 0; row < 10; row++) {
     for (let col = 0; col < 10; col++) {
+
         const peg = Bodies.circle(
             100 + col * 60 + (row % 2 ? 30 : 0),
             120 + row * 50,
@@ -99,15 +100,17 @@ const dividerColors = [
 const slotWidth = width / slotValues.length;
 
 //
-// 칸막이
+// 칸막이 (핀 간격만큼 아래로 이동)
 //
+const pegSpacing = 50;
+
 for (let i = 0; i <= slotValues.length; i++) {
 
     const x = i * slotWidth;
 
     const divider = Bodies.rectangle(
         x,
-        height - 70,
+        height - 70 + pegSpacing,   // ↓ 아래로 이동
         4,
         120,
         {
@@ -124,7 +127,7 @@ for (let i = 0; i <= slotValues.length; i++) {
 
     const cap = Bodies.circle(
         x,
-        height - 130,
+        height - 130 + pegSpacing,   // ↓ 아래로 이동
         7,
         {
             isStatic: true,
@@ -140,23 +143,23 @@ for (let i = 0; i <= slotValues.length; i++) {
 }
 
 //
-// 별 생성 함수 (크기 절반)
+// 별 생성 함수 (원래 크기 복구)
 //
 function createStarBall() {
 
     const x = width / 2 + (Math.random() * 100 - 50);
 
     const starVertices = [
-        { x: 0, y: -6 },
-        { x: 1.5, y: -2 },
-        { x: 6, y: -2 },
-        { x: 2.5, y: 1 },
-        { x: 4, y: 5.5 },
-        { x: 0, y: 3 },
-        { x: -4, y: 5.5 },
-        { x: -2.5, y: 1 },
-        { x: -6, y: -2 },
-        { x: -1.5, y: -2 }
+        { x: 0, y: -12 },
+        { x: 3, y: -4 },
+        { x: 12, y: -4 },
+        { x: 5, y: 2 },
+        { x: 8, y: 11 },
+        { x: 0, y: 6 },
+        { x: -8, y: 11 },
+        { x: -5, y: 2 },
+        { x: -12, y: -4 },
+        { x: -3, y: -4 }
     ];
 
     const star = Bodies.fromVertices(
@@ -233,7 +236,6 @@ Events.on(render, "afterRender", () => {
     for (let i = 0; i < slotValues.length; i++) {
 
         const x = i * slotWidth + slotWidth / 2;
-
         ctx.fillText(slotValues[i], x, height - 20);
     }
 

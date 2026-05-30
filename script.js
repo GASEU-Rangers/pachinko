@@ -41,25 +41,38 @@ const scoreElement = document.getElementById("score");
 // 벽
 //
 World.add(world, [
-    Bodies.rectangle(width / 2, height + 25, width, 50, {
-        isStatic: true
-    }),
+    Bodies.rectangle(
+        width / 2,
+        height + 25,
+        width,
+        50,
+        { isStatic: true }
+    ),
 
-    Bodies.rectangle(-25, height / 2, 50, height, {
-        isStatic: true
-    }),
+    Bodies.rectangle(
+        -25,
+        height / 2,
+        50,
+        height,
+        { isStatic: true }
+    ),
 
-    Bodies.rectangle(width + 25, height / 2, 50, height, {
-        isStatic: true
-    })
+    Bodies.rectangle(
+        width + 25,
+        height / 2,
+        50,
+        height,
+        { isStatic: true }
+    )
 ]);
 
 //
-// 핀 생성
+// 핀
 //
 const pegs = [];
 
 for (let row = 0; row < 10; row++) {
+
     for (let col = 0; col < 10; col++) {
 
         const peg = Bodies.circle(
@@ -69,7 +82,8 @@ for (let row = 0; row < 10; row++) {
             {
                 isStatic: true,
                 render: {
-                    fillStyle: "#222222"
+                    fillStyle: "#222222",
+                    strokeStyle: "#222222"
                 }
             }
         );
@@ -84,6 +98,7 @@ World.add(world, pegs);
 // 점수칸
 //
 const slotValues = [
+    1000,
     500,
     200,
     100,
@@ -93,131 +108,121 @@ const slotValues = [
     500
 ];
 
-const slotWidth = width / slotValues.length;
-
 const dividerColors = [
-    "#ff4d4d",
-    "#ff944d",
-    "#ffd24d",
-    "#4caf50",
-    "#4d79ff",
-    "#3f51b5",
-    "#9c27b0",
+    "#ff0000",
+    "#ff7f00",
+    "#ffff00",
+    "#00aa00",
+    "#0066ff",
+    "#000080",
+    "#8000ff",
     "#ff69b4"
 ];
 
+const slotWidth = width / slotValues.length;
+
 //
 // 칸막이
-//
-for (let i = 0; i < slotValues.length; i++) {
-
-    const x = i * slotWidth;
-
-    const divider = Bodies.rectangle(
-        x,
-        height - 50,
-        4,
-        80,
-        {
-            isStatic: true,
-            render: {
-                fillStyle: dividerColors[i]
-            }
-        }
-    );
-
-    World.add(world, divider);
-}
-
-//
-// 마지막 벽
-//
-World.add(
-    world,
-    Bodies.rectangle(
-        width,
-        height - 50,
-        4,
-        80,
-        {
-            isStatic: true,
-            render: {
-                fillStyle: dividerColors[7]
-            }
-        }
-    )
-);
-
-//
-// 칸막이 위 경사판
 //
 for (let i = 0; i <= slotValues.length; i++) {
 
     const x = i * slotWidth;
 
-    const leftRamp = Bodies.rectangle(
-        x - 8,
-        height - 95,
-        20,
+    const divider = Bodies.rectangle(
+        x,
+        height - 70,
         4,
+        120,
         {
             isStatic: true,
-            angle: Math.PI / 4,
             render: {
-                fillStyle: "#888"
+                fillStyle: dividerColors[
+                    Math.min(i, dividerColors.length - 1)
+                ]
             }
         }
     );
 
-    const rightRamp = Bodies.rectangle(
-        x + 8,
-        height - 95,
-        20,
-        4,
+    World.add(world, divider);
+
+    //
+    // 칸막이 상단 캡
+    //
+    const cap = Bodies.circle(
+        x,
+        height - 130,
+        7,
         {
             isStatic: true,
-            angle: -Math.PI / 4,
             render: {
-                fillStyle: "#888"
+                fillStyle: dividerColors[
+                    Math.min(i, dividerColors.length - 1)
+                ]
             }
         }
     );
 
-    World.add(world, [leftRamp, rightRamp]);
+    World.add(world, cap);
 }
 
 //
-// 구슬 발사
+// 별 생성 함수
+//
+function createStarBall() {
+
+    const x =
+        width / 2 +
+        (Math.random() * 100 - 50);
+
+    const starVertices = [
+        { x: 0, y: -12 },
+        { x: 3, y: -4 },
+        { x: 12, y: -4 },
+        { x: 5, y: 2 },
+        { x: 8, y: 11 },
+        { x: 0, y: 6 },
+        { x: -8, y: 11 },
+        { x: -5, y: 2 },
+        { x: -12, y: -4 },
+        { x: -3, y: -4 }
+    ];
+
+    const star = Bodies.fromVertices(
+        x,
+        40,
+        [starVertices],
+        {
+            restitution: 0.8,
+            friction: 0,
+            frictionAir: 0.01,
+            render: {
+                fillStyle: "#FFD700",
+                strokeStyle: "#D4AF37",
+                lineWidth: 1
+            }
+        },
+        true
+    );
+
+    star.label = "ball";
+
+    World.add(world, star);
+}
+
+//
+// 버튼
 //
 document
     .getElementById("dropBall")
-    .addEventListener("click", () => {
-
-        const ball = Bodies.circle(
-            width / 2 + (Math.random() * 100 - 50),
-            40,
-            10,
-            {
-                restitution: 0.8,
-                friction: 0,
-                frictionAir: 0.001,
-                render: {
-                    fillStyle: "#333333"
-                }
-            }
-        );
-
-        ball.label = "ball";
-
-        World.add(world, ball);
-    });
+    .addEventListener("click", createStarBall);
 
 //
 // 점수 계산
 //
 Events.on(engine, "afterUpdate", () => {
 
-    const bodies = Composite.allBodies(world);
+    const bodies =
+        Composite.allBodies(world);
 
     bodies.forEach(body => {
 
@@ -226,17 +231,23 @@ Events.on(engine, "afterUpdate", () => {
             body.position.y > height - 90
         ) {
 
-            const slotIndex = Math.max(
-                0,
-                Math.min(
-                    slotValues.length - 1,
-                    Math.floor(body.position.x / slotWidth)
-                )
-            );
+            const slotIndex =
+                Math.max(
+                    0,
+                    Math.min(
+                        slotValues.length - 1,
+                        Math.floor(
+                            body.position.x /
+                            slotWidth
+                        )
+                    )
+                );
 
-            score += slotValues[slotIndex];
+            score +=
+                slotValues[slotIndex];
 
-            scoreElement.textContent = score;
+            scoreElement.textContent =
+                score;
 
             World.remove(world, body);
         }
@@ -256,14 +267,20 @@ Events.on(render, "afterRender", () => {
     ctx.font = "16px sans-serif";
     ctx.textAlign = "center";
 
-    for (let i = 0; i < slotValues.length; i++) {
+    for (
+        let i = 0;
+        i < slotValues.length;
+        i++
+    ) {
 
-        const x = i * slotWidth + slotWidth / 2;
+        const x =
+            i * slotWidth +
+            slotWidth / 2;
 
         ctx.fillText(
             slotValues[i],
             x,
-            height - 15
+            height - 20
         );
     }
 

@@ -8,11 +8,10 @@ const {
     Composite
 } = Matter;
 
-const canvas = document.getElementById("game");
-
 const width = 800;
 const height = 700;
 
+const canvas = document.getElementById("game");
 canvas.width = width;
 canvas.height = height;
 
@@ -26,7 +25,7 @@ const render = Render.create({
         width,
         height,
         wireframes: false,
-        background: "#ffffff"
+        background: "#f0f0f0"
     }
 });
 
@@ -70,7 +69,7 @@ for (let row = 0; row < 10; row++) {
             {
                 isStatic: true,
                 render: {
-                    fillStyle: "#000000"
+                    fillStyle: "#222222"
                 }
             }
         );
@@ -94,18 +93,18 @@ const slotValues = [
     500
 ];
 
+const slotWidth = width / slotValues.length;
+
 const dividerColors = [
-    "#ff0000",
-    "#ff7f00",
-    "#ffff00",
-    "#00aa00",
-    "#0066ff",
-    "#000080",
-    "#8000ff",
+    "#ff4d4d",
+    "#ff944d",
+    "#ffd24d",
+    "#4caf50",
+    "#4d79ff",
+    "#3f51b5",
+    "#9c27b0",
     "#ff69b4"
 ];
-
-const slotWidth = width / slotValues.length;
 
 //
 // 칸막이
@@ -150,7 +149,7 @@ World.add(
 );
 
 //
-// 걸림 방지 경사판
+// 칸막이 위 경사판
 //
 for (let i = 0; i <= slotValues.length; i++) {
 
@@ -165,7 +164,7 @@ for (let i = 0; i <= slotValues.length; i++) {
             isStatic: true,
             angle: Math.PI / 4,
             render: {
-                fillStyle: "#666"
+                fillStyle: "#888"
             }
         }
     );
@@ -179,7 +178,7 @@ for (let i = 0; i <= slotValues.length; i++) {
             isStatic: true,
             angle: -Math.PI / 4,
             render: {
-                fillStyle: "#666"
+                fillStyle: "#888"
             }
         }
     );
@@ -203,7 +202,7 @@ document
                 friction: 0,
                 frictionAir: 0.001,
                 render: {
-                    fillStyle: "#000"
+                    fillStyle: "#333333"
                 }
             }
         );
@@ -224,12 +223,15 @@ Events.on(engine, "afterUpdate", () => {
 
         if (
             body.label === "ball" &&
-            body.position.y > height - 100
+            body.position.y > height - 90
         ) {
 
-            const slotIndex = Math.min(
-                slotValues.length - 1,
-                Math.floor(body.position.x / slotWidth)
+            const slotIndex = Math.max(
+                0,
+                Math.min(
+                    slotValues.length - 1,
+                    Math.floor(body.position.x / slotWidth)
+                )
             );
 
             score += slotValues[slotIndex];
@@ -256,9 +258,7 @@ Events.on(render, "afterRender", () => {
 
     for (let i = 0; i < slotValues.length; i++) {
 
-        const x =
-            i * slotWidth +
-            slotWidth / 2;
+        const x = i * slotWidth + slotWidth / 2;
 
         ctx.fillText(
             slotValues[i],

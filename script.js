@@ -41,29 +41,9 @@ const scoreElement = document.getElementById("score");
 // 벽
 //
 World.add(world, [
-    Bodies.rectangle(
-        width / 2,
-        height + 25,
-        width,
-        50,
-        { isStatic: true }
-    ),
-
-    Bodies.rectangle(
-        -25,
-        height / 2,
-        50,
-        height,
-        { isStatic: true }
-    ),
-
-    Bodies.rectangle(
-        width + 25,
-        height / 2,
-        50,
-        height,
-        { isStatic: true }
-    )
+    Bodies.rectangle(width / 2, height + 25, width, 50, { isStatic: true }),
+    Bodies.rectangle(-25, height / 2, 50, height, { isStatic: true }),
+    Bodies.rectangle(width + 25, height / 2, 50, height, { isStatic: true })
 ]);
 
 //
@@ -72,9 +52,7 @@ World.add(world, [
 const pegs = [];
 
 for (let row = 0; row < 10; row++) {
-
     for (let col = 0; col < 10; col++) {
-
         const peg = Bodies.circle(
             100 + col * 60 + (row % 2 ? 30 : 0),
             120 + row * 50,
@@ -98,14 +76,13 @@ World.add(world, pegs);
 // 점수칸
 //
 const slotValues = [
-    1000,
-    500,
-    200,
     100,
     50,
-    100,
-    200,
-    500
+    20,
+    10,
+    20,
+    50,
+    100
 ];
 
 const dividerColors = [
@@ -145,9 +122,6 @@ for (let i = 0; i <= slotValues.length; i++) {
 
     World.add(world, divider);
 
-    //
-    // 칸막이 상단 캡
-    //
     const cap = Bodies.circle(
         x,
         height - 130,
@@ -166,25 +140,23 @@ for (let i = 0; i <= slotValues.length; i++) {
 }
 
 //
-// 별 생성 함수
+// 별 생성 함수 (크기 절반)
 //
 function createStarBall() {
 
-    const x =
-        width / 2 +
-        (Math.random() * 100 - 50);
+    const x = width / 2 + (Math.random() * 100 - 50);
 
     const starVertices = [
-        { x: 0, y: -12 },
-        { x: 3, y: -4 },
-        { x: 12, y: -4 },
-        { x: 5, y: 2 },
-        { x: 8, y: 11 },
-        { x: 0, y: 6 },
-        { x: -8, y: 11 },
-        { x: -5, y: 2 },
-        { x: -12, y: -4 },
-        { x: -3, y: -4 }
+        { x: 0, y: -6 },
+        { x: 1.5, y: -2 },
+        { x: 6, y: -2 },
+        { x: 2.5, y: 1 },
+        { x: 4, y: 5.5 },
+        { x: 0, y: 3 },
+        { x: -4, y: 5.5 },
+        { x: -2.5, y: 1 },
+        { x: -6, y: -2 },
+        { x: -1.5, y: -2 }
     ];
 
     const star = Bodies.fromVertices(
@@ -221,8 +193,7 @@ document
 //
 Events.on(engine, "afterUpdate", () => {
 
-    const bodies =
-        Composite.allBodies(world);
+    const bodies = Composite.allBodies(world);
 
     bodies.forEach(body => {
 
@@ -231,23 +202,16 @@ Events.on(engine, "afterUpdate", () => {
             body.position.y > height - 90
         ) {
 
-            const slotIndex =
-                Math.max(
-                    0,
-                    Math.min(
-                        slotValues.length - 1,
-                        Math.floor(
-                            body.position.x /
-                            slotWidth
-                        )
-                    )
-                );
+            const slotIndex = Math.max(
+                0,
+                Math.min(
+                    slotValues.length - 1,
+                    Math.floor(body.position.x / slotWidth)
+                )
+            );
 
-            score +=
-                slotValues[slotIndex];
-
-            scoreElement.textContent =
-                score;
+            score += slotValues[slotIndex];
+            scoreElement.textContent = score;
 
             World.remove(world, body);
         }
@@ -262,26 +226,15 @@ Events.on(render, "afterRender", () => {
     const ctx = render.context;
 
     ctx.save();
-
     ctx.fillStyle = "#000";
     ctx.font = "16px sans-serif";
     ctx.textAlign = "center";
 
-    for (
-        let i = 0;
-        i < slotValues.length;
-        i++
-    ) {
+    for (let i = 0; i < slotValues.length; i++) {
 
-        const x =
-            i * slotWidth +
-            slotWidth / 2;
+        const x = i * slotWidth + slotWidth / 2;
 
-        ctx.fillText(
-            slotValues[i],
-            x,
-            height - 20
-        );
+        ctx.fillText(slotValues[i], x, height - 20);
     }
 
     ctx.restore();

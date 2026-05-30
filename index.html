@@ -6,13 +6,18 @@
     <title>Pachinko Game</title>
     <link rel="stylesheet" href="style.css">
 </head>
-<body>
-    <div class="ui">
-        <div>점수: <span id="score">0</span></div>
-        <button id="dropBall">구슬 발사</button>
-    </div>
 
-    <canvas id="game"></canvas>
+<body>
+    <div class="container">
+        <h1>모노폴리 랜덤 룰렛</h1>
+
+        <div class="ui">
+            <div>점수: <span id="score">0</span></div>
+            <button id="dropBall">구슬 발사</button>
+        </div>
+
+        <canvas id="game"></canvas>
+    </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.20.0/matter.min.js"></script>
     <script src="script.js"></script>

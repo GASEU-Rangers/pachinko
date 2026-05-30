@@ -1,0 +1,30 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: #111;
+    color: white;
+    text-align: center;
+    font-family: Arial, sans-serif;
+}
+
+.ui {
+    padding: 20px;
+}
+
+button {
+    margin-top: 10px;
+    padding: 10px 18px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+canvas {
+    display: block;
+    margin: 0 auto;
+    border: 2px solid white;
+    background: #1d1d1d;
+}

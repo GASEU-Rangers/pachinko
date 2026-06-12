@@ -47,8 +47,7 @@ World.add(world, [
 ]);
 
 //
-// 핀
-//
+
 const pegs = [];
 
 for (let row = 0; row < 10; row++) {
@@ -74,8 +73,7 @@ for (let row = 0; row < 10; row++) {
 World.add(world, pegs);
 
 //
-// 점수칸
-//
+
 const slotValues = [
     100,
     50,
@@ -100,8 +98,7 @@ const dividerColors = [
 const slotWidth = width / slotValues.length;
 
 //
-// 칸막이 (핀 간격만큼 아래로 이동)
-//
+
 const pegSpacing = 50;
 
 for (let i = 0; i <= slotValues.length; i++) {
@@ -143,8 +140,7 @@ for (let i = 0; i <= slotValues.length; i++) {
 }
 
 //
-// 별 생성 함수 (원래 크기 복구)
-//
+
 function createStarBall() {
 
     const x = width / 2 + (Math.random() * 100 - 50);
@@ -185,15 +181,13 @@ function createStarBall() {
 }
 
 //
-// 버튼
-//
+
 document
     .getElementById("dropBall")
     .addEventListener("click", createStarBall);
 
 //
-// 점수 계산
-//
+
 Events.on(engine, "afterUpdate", () => {
 
     const bodies = Composite.allBodies(world);
@@ -222,8 +216,7 @@ Events.on(engine, "afterUpdate", () => {
 });
 
 //
-// 점수 표시
-//
+
 Events.on(render, "afterRender", () => {
 
     const ctx = render.context;

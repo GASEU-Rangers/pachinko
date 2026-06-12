@@ -8,8 +8,8 @@ const {
     Composite
 } = Matter;
 
-const width = 800;
-const height = 700;
+const width = 80%;
+const height = 70%;
 
 const canvas = document.getElementById("game");
 canvas.width = width;

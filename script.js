@@ -38,8 +38,7 @@ let score = 0;
 const scoreElement = document.getElementById("score");
 
 //
-// 벽
-//
+
 World.add(world, [
     Bodies.rectangle(width / 2, height + 25, width, 50, { isStatic: true }),
     Bodies.rectangle(-25, height / 2, 50, height, { isStatic: true }),
